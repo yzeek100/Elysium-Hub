@@ -13,7 +13,6 @@ const App: React.FC = () => {
   const [nav, setNav] = useState<NavState>({ view: 'marketplace' });
   const [creators, setCreators] = useState<Creator[]>([]);
   const [loading, setLoading] = useState(true);
-  const [configError, setConfigError] = useState(false);
   
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
@@ -21,22 +20,19 @@ const App: React.FC = () => {
   const [isLocating, setIsLocating] = useState(false);
 
   useEffect(() => {
-    if (!supabase) {
-      setConfigError(true);
-      setLoading(false);
-    } else {
-      loadCreators();
-    }
+    loadCreators();
     handleDetectLocation();
   }, []);
 
   const loadCreators = async () => {
     setLoading(true);
     try {
-      const data = await creatorService.getAll();
-      setCreators(data);
+      if (supabase) {
+        const data = await creatorService.getAll();
+        setCreators(data);
+      }
     } catch (err) {
-      console.error(err);
+      console.error("Erro ao carregar criadores:", err);
     } finally {
       setLoading(false);
     }
@@ -61,13 +57,9 @@ const App: React.FC = () => {
   };
 
   const filteredCreators = creators.filter(creator => {
-    // Filter by city
     const cityToFilter = selectedCity || detectedCity;
     const cityMatch = !cityToFilter || creator.location_city?.toLowerCase().includes(cityToFilter.toLowerCase());
-    
-    // Filter by gender
     const genderMatch = selectedGender === 'Todos' || creator.gender === selectedGender;
-
     return cityMatch && genderMatch;
   });
 
@@ -79,19 +71,6 @@ const App: React.FC = () => {
            <h1 className="text-2xl font-black tracking-tighter text-slate-900">ELYSIUM HUB</h1>
            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mt-1">Premium Creator Marketplace</p>
         </div>
-
-        {configError && (
-          <div className="bg-rose-50 border-2 border-rose-200 p-8 rounded-[2.5rem] text-center space-y-4 mx-4 shadow-xl">
-            <div className="w-12 h-12 bg-rose-500 rounded-full flex items-center justify-center mx-auto text-white mb-2">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-            </div>
-            <p className="text-rose-900 font-black text-sm uppercase tracking-widest">Conexão Pendente</p>
-            <p className="text-rose-700 text-sm font-bold leading-relaxed">
-              O sistema não detectou as chaves de acesso ao banco de dados.<br/>
-              <b>No Netlify:</b> Adicione <u>VITE_SUPABASE_URL</u> e <u>VITE_SUPABASE_ANON_KEY</u> em Environment Variables e faça um novo Deploy com "Clear Cache".
-            </p>
-          </div>
-        )}
 
         <SearchBar 
           detectedCity={detectedCity} 

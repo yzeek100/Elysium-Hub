@@ -1,48 +1,25 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-/**
- * IMPORTANTE: Em ambientes de produção (Vite/Netlify), as variáveis de ambiente 
- * DEVEM ser acessadas de forma literal (ex: import.meta.env.VITE_VAR).
- * Acesso dinâmico como import.meta.env[key] NÃO funciona no build final.
- */
-
-const getSupabaseConfig = () => {
-  // 1. Tenta acesso literal via Vite (Padrão para Netlify Moderno)
+// Acesso às variáveis de ambiente de forma compatível com Vite/Netlify
+const SUPABASE_URL = 
   // @ts-ignore
-  let url = import.meta.env?.VITE_SUPABASE_URL;
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_URL) || 
   // @ts-ignore
-  let key = import.meta.env?.VITE_SUPABASE_ANON_KEY;
+  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_URL) || 
+  '';
 
-  // 2. Fallback: Tenta acesso literal via process.env (Padrão Node/Webpack/Netlify Build)
-  if (!url || !key) {
-    try {
-      // @ts-ignore
-      url = url || (typeof process !== 'undefined' ? process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL : undefined);
-      // @ts-ignore
-      key = key || (typeof process !== 'undefined' ? process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY : undefined);
-    } catch (e) {
-      // Ignora erro se process não estiver definido
-    }
-  }
+const SUPABASE_ANON_KEY = 
+  // @ts-ignore
+  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_SUPABASE_ANON_KEY) || 
+  // @ts-ignore
+  (typeof process !== 'undefined' && process.env?.VITE_SUPABASE_ANON_KEY) || 
+  '';
 
-  return {
-    url: (url || '').trim(),
-    key: (key || '').trim()
-  };
-};
+const cleanUrl = SUPABASE_URL.trim();
+const cleanKey = SUPABASE_ANON_KEY.trim();
 
-const config = getSupabaseConfig();
-
-// Inicialização do cliente apenas se as chaves existirem
-export const supabase = (config.url && config.key) 
-  ? createClient(config.url, config.key) 
+// Exporta o cliente. Se não houver chaves, será null, mas sem disparar alertas fatais.
+export const supabase = (cleanUrl && cleanKey) 
+  ? createClient(cleanUrl, cleanKey) 
   : null;
-
-// Log de erro aprimorado para diagnóstico
-if (!supabase) {
-  console.error(
-    "ELYSIUM HUB ERROR: Chaves do Supabase ausentes no ambiente.\n" +
-    "Solução:\n" +
-    "1. No Netlify: Vá em 'Site Settings' > 'Environment Variables'\n" +
-    "2. Adicione VITE_SUPABASE_URL e VITE_SUPABASE_AN
