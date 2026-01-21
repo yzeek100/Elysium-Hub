@@ -4,7 +4,10 @@ import { Creator } from '../types';
 
 export const creatorService = {
   async getAll(): Promise<Creator[]> {
-    if (!supabase) return [];
+    if (!supabase) {
+      console.error("Supabase não inicializado. Verifique SUPABASE_URL e SUPABASE_ANON_KEY.");
+      return [];
+    }
 
     try {
       const { data, error } = await supabase
@@ -41,7 +44,7 @@ export const creatorService = {
 
   async create(creatorData: Partial<Creator>) {
     if (!supabase) {
-      throw new Error("As chaves do banco de dados não foram detectadas. Certifique-se de adicioná-las no painel do Netlify e fazer um NOVO DEPLOY.");
+      throw new Error("O site não conseguiu ler as chaves do banco. No Netlify, as variáveis devem estar no painel de Environment Variables.");
     }
 
     const payload = {
@@ -67,10 +70,11 @@ export const creatorService = {
       .select();
 
     if (error) {
+      console.error("Erro detalhado do Supabase:", error);
       if (error.code === '42P01') {
-        throw new Error("A tabela 'creators' não existe no banco. Vá no Supabase > SQL Editor e execute o comando de criação.");
+        throw new Error("A tabela 'creators' ainda não foi criada. Execute o SQL de criação no painel do Supabase.");
       }
-      throw error;
+      throw new Error(`Erro do Banco: ${error.message}`);
     }
     return data;
   }
