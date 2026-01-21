@@ -1,4 +1,3 @@
-
 import { supabase } from '../lib/supabase';
 import { Creator } from '../types';
 
@@ -29,6 +28,8 @@ export const creatorService = {
         avatar: item.avatar,
         location_city: item.location_city,
         location_area: item.location_area,
+        location_lat: item.location_lat,
+        location_lng: item.location_lng,
         baseRate: item.base_rate,
         online: item.online,
         photos: item.photos || [],
@@ -67,6 +68,8 @@ export const creatorService = {
       avatar: creatorData.avatar,
       location_city: creatorData.location_city,
       location_area: creatorData.location_area,
+      location_lat: creatorData.location_lat,
+      location_lng: creatorData.location_lng,
       base_rate: Number(creatorData.baseRate) || 0,
       photos: creatorData.photos || [],
       about_tags: creatorData.aboutTags || [],

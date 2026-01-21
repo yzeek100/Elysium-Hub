@@ -1,51 +1,58 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elysium Hub - Premium Marketplace</title>
+    <title>Elysium Hub - Premium Creator Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
           --brand-pink: #F13E5A;
-          --deep-slate: #0F172A;
+          --apple-gray: #F5F5F7;
         }
         body { 
-          font-family: 'Plus Jakarta Sans', sans-serif; 
-          background-color: #F8FAFC; 
-          color: var(--deep-slate); 
-          letter-spacing: -0.01em;
-          overflow-x: hidden;
+          font-family: 'Inter', sans-serif; 
+          background-color: #FAFAFA; 
+          color: #1D1D1F; 
+          letter-spacing: -0.02em;
+          -webkit-font-smoothing: antialiased;
         }
         
-        .bg-brand-pink { background-color: var(--brand-pink); }
-        .text-brand-pink { color: var(--brand-pink); }
-        .border-brand-pink { border-color: var(--brand-pink); }
-        .accent-brand-pink { accent-color: var(--brand-pink); }
+        .glass {
+          background: rgba(255, 255, 255, 0.7);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+        }
 
-        /* Smooth scrolling */
-        html { scroll-behavior: smooth; }
+        .glass-dark {
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--brand-pink); }
+        .shadow-premium {
+          box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        }
+
+        .shadow-card {
+          box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        .shadow-premium {
-          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-
-        @keyframes pulse-soft {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+        .animate-fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .story-gradient {
+          background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
         }
-        .animate-pulse-soft { animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 <script type="importmap">
 {
@@ -61,7 +68,6 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- Script de entrada obrigatório para o React funcionar -->
     <script type="module" src="./index.tsx"></script>
 </body>
 </html>
