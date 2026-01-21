@@ -1,27 +1,21 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const getEnv = (key: string): string => {
-  if (typeof process !== 'undefined' && process.env && process.env[key]) {
-    return process.env[key] as string;
-  }
-  if (typeof window !== 'undefined' && (window as any).env && (window as any).env[key]) {
-    return (window as any).env[key];
-  }
-  return '';
-};
-
 export const aiService = {
   generateBio: async (name: string, tags: string[], age: string) => {
-    // A chave DEVE vir de process.env.API_KEY conforme as regras
-    const apiKey = getEnv('API_KEY');
+    // Guideline: The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+    const apiKey = process.env.API_KEY;
     
     if (!apiKey) {
+      console.warn("API_KEY não encontrada. Usando bio padrão.");
       return `Olá! Sou ${name}, tenho ${age} anos e estou ansiosa para te conhecer. Confira meus serviços!`;
     }
 
     try {
-      const ai = new GoogleGenAI({ apiKey });
+      // Guideline: Use this process.env.API_KEY string directly when initializing the @google/genai client instance.
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      
+      // Guideline: Use ai.models.generateContent to query GenAI with both the model name and prompt.
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: `Escreva uma biografia curta, sedutora e elegante para um perfil de acompanhante premium. 
@@ -29,6 +23,7 @@ export const aiService = {
         Escreva em primeira pessoa, de forma profissional mas envolvente. Máximo 3 linhas.`,
       });
 
+      // Guideline: Access the .text property (not a method) directly from the response.
       return response.text || `Olá! Sou ${name}, prazer em te conhecer.`;
     } catch (error) {
       console.error("Erro na IA:", error);
