@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { creatorService } from '../services/creatorService';
 import { aiService } from '../services/aiService';
+import { GenderCategory } from '../types';
 
 const TAG_OPTIONS = {
   about: [
@@ -27,6 +28,7 @@ const RegistrationPanel: React.FC<{ onComplete: () => void }> = ({ onComplete })
     name: '',
     phone: '',
     age: '',
+    gender: 'Mulher' as GenderCategory,
     location_city: '',
     location_area: '',
     bio: '',
@@ -38,7 +40,7 @@ const RegistrationPanel: React.FC<{ onComplete: () => void }> = ({ onComplete })
 
   const totalSteps = 5;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
@@ -163,6 +165,19 @@ const RegistrationPanel: React.FC<{ onComplete: () => void }> = ({ onComplete })
               <InputField label="Nome Artístico" name="name" placeholder="Ex: Mirella Silva" />
               <InputField label="WhatsApp" name="phone" placeholder="(11) 99999-9999" />
               <InputField label="Idade" name="age" placeholder="Mínimo 18" type="number" />
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Categoria</label>
+                <select 
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border-2 border-slate-100 px-5 py-4 text-slate-900 text-sm rounded-2xl focus:outline-none focus:border-[#F13E5A] focus:bg-white transition-all font-bold appearance-none"
+                >
+                  <option value="Mulher">Mulher</option>
+                  <option value="Homem">Homem</option>
+                  <option value="Homossexual">Homossexual</option>
+                </select>
+              </div>
               <div className="space-y-2">
                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Cidade</label>
                  <div className="relative">

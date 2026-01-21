@@ -4,7 +4,8 @@ import ProfileCard from './components/ProfileCard';
 import Dashboard from './components/Dashboard';
 import SearchBar from './components/SearchBar';
 import RegistrationPanel from './components/RegistrationPanel';
-import { Creator, NavState } from './types';
+import AdminPanel from './components/AdminPanel';
+import { Creator, NavState, GenderCategory } from './types';
 import { creatorService } from './services/creatorService';
 import { supabase } from './lib/supabase';
 
@@ -16,6 +17,7 @@ const App: React.FC = () => {
   
   const [detectedCity, setDetectedCity] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedGender, setSelectedGender] = useState<GenderCategory | 'Todos'>('Todos');
   const [isLocating, setIsLocating] = useState(false);
 
   useEffect(() => {
@@ -59,9 +61,14 @@ const App: React.FC = () => {
   };
 
   const filteredCreators = creators.filter(creator => {
+    // Filter by city
     const cityToFilter = selectedCity || detectedCity;
-    if (!cityToFilter) return true;
-    return creator.location_city?.toLowerCase().includes(cityToFilter.toLowerCase());
+    const cityMatch = !cityToFilter || creator.location_city?.toLowerCase().includes(cityToFilter.toLowerCase());
+    
+    // Filter by gender
+    const genderMatch = selectedGender === 'Todos' || creator.gender === selectedGender;
+
+    return cityMatch && genderMatch;
   });
 
   const renderMarketplace = () => {
@@ -74,19 +81,28 @@ const App: React.FC = () => {
         </div>
 
         {configError && (
-          <div className="bg-amber-50 border-2 border-amber-200 p-6 rounded-[2rem] text-center space-y-3 mx-4">
-            <p className="text-amber-800 font-black text-xs uppercase tracking-widest">Configuração Necessária</p>
-            <p className="text-amber-600 text-sm font-medium">O banco de dados não foi detectado. Adicione <b>SUPABASE_URL</b> e <b>SUPABASE_ANON_KEY</b> nas "Environment Variables" da Netlify.</p>
+          <div className="bg-rose-50 border-2 border-rose-200 p-8 rounded-[2.5rem] text-center space-y-4 mx-4 shadow-xl">
+            <div className="w-12 h-12 bg-rose-500 rounded-full flex items-center justify-center mx-auto text-white mb-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <p className="text-rose-900 font-black text-sm uppercase tracking-widest">Conexão Pendente</p>
+            <p className="text-rose-700 text-sm font-bold leading-relaxed">
+              O sistema não detectou as chaves de acesso ao banco de dados.<br/>
+              <b>No Netlify:</b> Adicione <u>VITE_SUPABASE_URL</u> e <u>VITE_SUPABASE_ANON_KEY</u> em Environment Variables e faça um novo Deploy com "Clear Cache".
+            </p>
           </div>
         )}
 
         <SearchBar 
           detectedCity={detectedCity} 
           selectedCity={selectedCity}
+          selectedGender={selectedGender}
           isLocating={isLocating} 
           onLocate={handleDetectLocation} 
           onCityChange={(city) => setSelectedCity(city)}
+          onGenderChange={(gender) => setSelectedGender(gender)}
           onRegisterClick={() => setView('registration')}
+          onAdminClick={() => setView('admin')}
         />
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
@@ -111,7 +127,7 @@ const App: React.FC = () => {
                <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-300">
                  <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
                </div>
-               <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">Nenhum perfil ativo nesta região</p>
+               <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-xs">Nenhum perfil nesta categoria/região</p>
                <button onClick={() => setView('registration')} className="bg-slate-900 text-white px-8 py-4 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg">Seja a primeira de sua cidade</button>
             </div>
           )}
@@ -156,7 +172,7 @@ const App: React.FC = () => {
                 {creator.name}
               </h1>
               <div className="flex items-center gap-2 text-[13px] text-slate-500 font-bold uppercase tracking-tight">
-                <span>Criadora</span>
+                <span>{creator.gender}</span>
                 <span className="text-slate-300">•</span>
                 <span>{creator.age} anos</span>
               </div>
@@ -214,6 +230,9 @@ const App: React.FC = () => {
         {nav.view === 'profile' && renderProfile()}
         {nav.view === 'registration' && (
           <RegistrationPanel onComplete={() => { loadCreators(); setView('marketplace'); }} />
+        )}
+        {nav.view === 'admin' && (
+          <AdminPanel onBack={() => { loadCreators(); setView('marketplace'); }} />
         )}
       </main>
       <footer className="mt-20 border-t-2 border-slate-100 py-16 px-8 text-center bg-white">

@@ -1,52 +1,48 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// Acesso estático às variáveis. Isso permite que o Netlify/Vite 
-// substitua o texto process.env.VAR pelo valor real durante o build.
+/**
+ * IMPORTANTE: Em ambientes de produção (Vite/Netlify), as variáveis de ambiente 
+ * DEVEM ser acessadas de forma literal (ex: import.meta.env.VITE_VAR).
+ * Acesso dinâmico como import.meta.env[key] NÃO funciona no build final.
+ */
 
-let supabaseUrl = '';
-let supabaseAnonKey = '';
-
-try {
-  // 1. Tenta via process.env (Padrão para injetar no build)
+const getSupabaseConfig = () => {
+  // 1. Tenta acesso literal via Vite (Padrão para Netlify Moderno)
   // @ts-ignore
-  supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL || '';
+  let url = import.meta.env?.VITE_SUPABASE_URL;
   // @ts-ignore
-  supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || '';
+  let key = import.meta.env?.VITE_SUPABASE_ANON_KEY;
 
-  // 2. Tenta via import.meta.env (Padrão Vite ESM)
-  if (!supabaseUrl || !supabaseAnonKey) {
-    const metaEnv = (import.meta as any).env;
-    if (metaEnv) {
-      supabaseUrl = supabaseUrl || metaEnv.VITE_SUPABASE_URL || metaEnv.SUPABASE_URL || '';
-      supabaseAnonKey = supabaseAnonKey || metaEnv.VITE_SUPABASE_ANON_KEY || metaEnv.SUPABASE_ANON_KEY || '';
+  // 2. Fallback: Tenta acesso literal via process.env (Padrão Node/Webpack/Netlify Build)
+  if (!url || !key) {
+    try {
+      // @ts-ignore
+      url = url || (typeof process !== 'undefined' ? process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL : undefined);
+      // @ts-ignore
+      key = key || (typeof process !== 'undefined' ? process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY : undefined);
+    } catch (e) {
+      // Ignora erro se process não estiver definido
     }
   }
 
-  // 3. Fallback para window.env (Caso de injeção externa)
-  if (!supabaseUrl || !supabaseAnonKey) {
-    const anyWindow = window as any;
-    if (anyWindow.env) {
-      supabaseUrl = supabaseUrl || anyWindow.env.VITE_SUPABASE_URL || anyWindow.env.SUPABASE_URL || '';
-      supabaseAnonKey = supabaseAnonKey || anyWindow.env.VITE_SUPABASE_ANON_KEY || anyWindow.env.SUPABASE_ANON_KEY || '';
-    }
-  }
-} catch (e) {
-  console.warn("Erro ao ler variáveis de ambiente:", e);
-}
+  return {
+    url: (url || '').trim(),
+    key: (key || '').trim()
+  };
+};
 
-// Limpeza e validação
-supabaseUrl = supabaseUrl.trim();
-supabaseAnonKey = supabaseAnonKey.trim();
+const config = getSupabaseConfig();
 
-export const supabase = (supabaseUrl && supabaseAnonKey) 
-  ? createClient(supabaseUrl, supabaseAnonKey) 
+// Inicialização do cliente apenas se as chaves existirem
+export const supabase = (config.url && config.key) 
+  ? createClient(config.url, config.key) 
   : null;
 
+// Log de erro aprimorado para diagnóstico
 if (!supabase) {
   console.error(
-    "ELYSIUM CRITICAL: Chaves do Supabase não encontradas. " +
-    "Atenção: Se você já configurou no Netlify, você DEVE ir em 'Deploys' -> 'Trigger Deploy' -> 'Clear cache and deploy site' " +
-    "para que as novas variáveis sejam injetadas no seu site."
-  );
-}
+    "ELYSIUM HUB ERROR: Chaves do Supabase ausentes no ambiente.\n" +
+    "Solução:\n" +
+    "1. No Netlify: Vá em 'Site Settings' > 'Environment Variables'\n" +
+    "2. Adicione VITE_SUPABASE_URL e VITE_SUPABASE_AN

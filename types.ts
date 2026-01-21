@@ -6,10 +6,13 @@ export enum ServiceType {
   RESERVED_TIME = 'Sessão Exclusiva'
 }
 
+export type GenderCategory = 'Mulher' | 'Homem' | 'Homossexual';
+
 export interface Creator {
   id: string;
   name: string;
   username: string;
+  gender: GenderCategory;
   bio: string;
   avatar: string;
   rating: number;
@@ -39,6 +42,6 @@ export interface Creator {
 }
 
 export interface NavState {
-  view: 'home' | 'marketplace' | 'dashboard' | 'profile' | 'registration';
+  view: 'home' | 'marketplace' | 'dashboard' | 'profile' | 'registration' | 'admin';
   selectedCreatorId?: string;
 }

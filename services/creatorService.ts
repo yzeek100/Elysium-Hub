@@ -22,6 +22,7 @@ export const creatorService = {
         id: item.id,
         name: item.name,
         username: item.username,
+        gender: item.gender || 'Mulher',
         age: item.age,
         phone: item.phone,
         bio: item.bio,
@@ -42,6 +43,15 @@ export const creatorService = {
     }
   },
 
+  async delete(id: string) {
+    if (!supabase) return;
+    const { error } = await supabase
+      .from('creators')
+      .delete()
+      .eq('id', id);
+    if (error) throw error;
+  },
+
   async create(creatorData: Partial<Creator>) {
     if (!supabase) {
       throw new Error("O site não conseguiu ler as chaves do banco. No Netlify, as variáveis devem estar no painel de Environment Variables.");
@@ -50,6 +60,7 @@ export const creatorService = {
     const payload = {
       name: creatorData.name,
       username: `@${creatorData.name?.toLowerCase().replace(/\s/g, '_')}_${Math.floor(Math.random() * 1000)}`,
+      gender: creatorData.gender,
       age: Number(creatorData.age) || 18,
       phone: creatorData.phone,
       bio: creatorData.bio,

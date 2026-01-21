@@ -1,32 +1,35 @@
 
 import React from 'react';
+import { GenderCategory } from '../types';
 
 interface SearchBarProps {
   detectedCity?: string | null;
   selectedCity?: string | null;
+  selectedGender: GenderCategory | 'Todos';
   isLocating?: boolean;
   onLocate?: () => void;
   onCityChange: (city: string | null) => void;
+  onGenderChange: (gender: GenderCategory | 'Todos') => void;
   onRegisterClick: () => void;
+  onAdminClick: () => void;
 }
 
 const POPULAR_CITIES = [
-  'São Paulo',
-  'Rio de Janeiro',
-  'Belo Horizonte',
-  'Curitiba',
-  'Brasília',
-  'Porto Alegre',
-  'Salvador'
+  'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Curitiba', 'Brasília'
 ];
+
+const GENDERS: (GenderCategory | 'Todos')[] = ['Todos', 'Mulher', 'Homem', 'Homossexual'];
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
   detectedCity, 
   selectedCity, 
+  selectedGender,
   isLocating, 
   onLocate, 
   onCityChange,
-  onRegisterClick
+  onGenderChange,
+  onRegisterClick,
+  onAdminClick
 }) => {
   const currentCity = selectedCity || detectedCity;
 
@@ -47,11 +50,12 @@ const SearchBar: React.FC<SearchBarProps> = ({
           />
         </div>
         
-        <button className="bg-slate-900 hover:bg-slate-800 text-white px-10 py-5 font-black text-[12px] uppercase tracking-[0.3em] transition-all rounded-2xl shrink-0">
-          Pesquisar
+        <button 
+          onClick={onAdminClick}
+          className="bg-slate-100 text-slate-400 hover:text-slate-900 px-4 py-5 font-black text-[10px] uppercase tracking-widest transition-all rounded-2xl"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
         </button>
-
-        <div className="hidden md:block w-[2px] bg-slate-100 mx-2"></div>
 
         <button 
           onClick={onRegisterClick}
@@ -59,6 +63,22 @@ const SearchBar: React.FC<SearchBarProps> = ({
         >
           Anuncie Grátis
         </button>
+      </div>
+
+      {/* Category Filter */}
+      <div className="space-y-4">
+        <span className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]">Categorias</span>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar">
+          {GENDERS.map(g => (
+            <button 
+              key={g}
+              onClick={() => onGenderChange(g)}
+              className={`shrink-0 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${selectedGender === g ? 'bg-rose-500 border-rose-500 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'}`}
+            >
+              {g}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* City Filter Row */}
@@ -73,7 +93,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-2 px-2">
            <button 
              onClick={() => onCityChange(null)}
-             className={`shrink-0 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${!selectedCity ? 'bg-[#F13E5A] border-[#F13E5A] text-white shadow-lg' : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'}`}
+             className={`shrink-0 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${!selectedCity ? 'bg-slate-900 border-slate-900 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-500 hover:border-slate-300'}`}
            >
              Brasil
            </button>
