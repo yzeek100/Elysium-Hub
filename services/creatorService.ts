@@ -32,6 +32,7 @@ export const creatorService = {
         location_lng: item.location_lng,
         baseRate: item.base_rate,
         online: item.online,
+        verified: item.verified,
         photos: item.photos || [],
         aboutTags: item.about_tags || [],
         servicesTags: item.services_tags || [],
@@ -45,7 +46,7 @@ export const creatorService = {
   },
 
   async delete(id: string) {
-    if (!supabase) return;
+    if (!supabase) throw new Error("Supabase não configurado.");
     const { error } = await supabase
       .from('creators')
       .delete()
@@ -53,9 +54,27 @@ export const creatorService = {
     if (error) throw error;
   },
 
+  async update(id: string, updates: Partial<Creator>) {
+    if (!supabase) throw new Error("Supabase não configurado.");
+    
+    // Mapeia os campos do camelCase do frontend para o snake_case do banco
+    const payload: any = {};
+    if (updates.name !== undefined) payload.name = updates.name;
+    if (updates.online !== undefined) payload.online = updates.online;
+    if (updates.verified !== undefined) payload.verified = updates.verified;
+    if (updates.baseRate !== undefined) payload.base_rate = updates.baseRate;
+    
+    const { error } = await supabase
+      .from('creators')
+      .update(payload)
+      .eq('id', id);
+      
+    if (error) throw error;
+  },
+
   async create(creatorData: Partial<Creator>) {
     if (!supabase) {
-      throw new Error("O site não conseguiu ler as chaves do banco. No Netlify, as variáveis devem estar no painel de Environment Variables.");
+      throw new Error("O site não conseguiu ler as chaves do banco.");
     }
 
     const payload = {
@@ -75,6 +94,7 @@ export const creatorService = {
       about_tags: creatorData.aboutTags || [],
       services_tags: creatorData.servicesTags || [],
       online: true,
+      verified: false,
       rating: 5
     };
 
@@ -83,13 +103,7 @@ export const creatorService = {
       .insert([payload])
       .select();
 
-    if (error) {
-      console.error("Erro detalhado do Supabase:", error);
-      if (error.code === '42P01') {
-        throw new Error("A tabela 'creators' ainda não foi criada. Execute o SQL de criação no painel do Supabase.");
-      }
-      throw new Error(`Erro do Banco: ${error.message}`);
-    }
+    if (error) throw error;
     return data;
   }
 };
