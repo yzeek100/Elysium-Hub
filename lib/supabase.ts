@@ -29,7 +29,7 @@ const getEnvVar = (name: string): string => {
       if (anyWindow.env[name]) return anyWindow.env[name];
     }
   } catch (e) {
-    // Silencioso para não poluir o console se o acesso falhar
+    // Silencioso para não poluir o console se o acesso falharr
   }
   
   return '';
