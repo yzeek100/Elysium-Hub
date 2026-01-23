@@ -44,7 +44,12 @@ const DarkTextArea = ({ label, name, value, onChange, placeholder }: any) => (
   </div>
 );
 
-const RegistrationPanel: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
+interface RegistrationPanelProps {
+  onComplete: () => void;
+  onCancel: () => void;
+}
+
+const RegistrationPanel: React.FC<RegistrationPanelProps> = ({ onComplete, onCancel }) => {
   const [step, setStep] = useState(1);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -351,9 +356,8 @@ const RegistrationPanel: React.FC<{ onComplete: () => void }> = ({ onComplete })
         <div className="flex justify-between mt-20 pt-10 border-t-2 border-slate-900">
           <button 
             type="button"
-            onClick={() => setStep(s => s - 1)}
-            disabled={step === 1}
-            className={`text-[12px] font-black uppercase tracking-widest transition-all ${step === 1 ? 'opacity-0' : 'text-slate-500 hover:text-white'}`}
+            onClick={() => step === 1 ? onCancel() : setStep(s => s - 1)}
+            className="text-[12px] font-black uppercase tracking-widest transition-all text-slate-500 hover:text-white"
           >
             ← Voltar
           </button>

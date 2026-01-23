@@ -11,34 +11,27 @@ export type GenderCategory = 'Mulher' | 'Homem' | 'Homossexual';
 export interface Creator {
   id: string;
   name: string;
-  username: string;
+  age: number;
+  whatsapp: string;
+  description: string;
+  photos: string[];
+  services: string[];
+  rates: { 
+    hour: number; 
+    overnight: number; 
+  };
   gender: GenderCategory;
-  bio: string;
-  avatar: string;
-  rating: number;
-  ratingCount?: number;
+  location_city: string;
   online: boolean;
-  offlineTime?: string;
-  baseRate: number;
-  age?: number;
-  phone?: string;
-  referenceCode?: string;
-  lastUpdated?: string;
+  avatar: string;
   verified?: boolean;
-  schedule?: string;
-  areasServed?: string[];
-  catchphrase?: string;
-  audioDuration?: string;
-  location_area?: string;
-  location_city?: string;
+  ratingCount?: number;
   location_lat?: number;
   location_lng?: number;
-  rates?: { duration: string; price: string }[];
-  aboutTags?: string[];
-  servicesTags?: string[];
-  specialServicesTags?: string[];
-  environmentTags?: string[];
-  photos?: string[];
+  // CamposLegado para compatibilidade com o banco
+  bio?: string;
+  phone?: string;
+  baseRate?: number;
 }
 
 export interface NavState {

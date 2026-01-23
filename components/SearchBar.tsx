@@ -1,12 +1,16 @@
+
 import React from 'react';
 import { GenderCategory } from '../types';
 import LocationFilter from './LocationFilter';
 
 interface SearchBarProps {
+  selectedUf: string;
+  selectedCity: string | null;
   selectedGender: GenderCategory | 'Todos';
   minPrice: string;
   maxPrice: string;
   radius: number | 'Ilimitado';
+  onUfChange: (uf: string) => void;
   onCityChange: (city: string | null) => void;
   onGenderChange: (gender: GenderCategory | 'Todos') => void;
   onPriceChange: (min: string, max: string) => void;
@@ -19,7 +23,7 @@ const GENDERS: (GenderCategory | 'Todos')[] = ['Todos', 'Mulher', 'Homem', 'Homo
 const RADIUS_OPTIONS: (number | 'Ilimitado')[] = ['Ilimitado', 10, 25, 50, 100];
 
 const SearchBar: React.FC<SearchBarProps> = ({ 
-  selectedGender, minPrice, maxPrice, radius, onCityChange, onGenderChange, onPriceChange, onRadiusChange, onRegisterClick, onAdminClick
+  selectedUf, selectedCity, selectedGender, minPrice, maxPrice, radius, onUfChange, onCityChange, onGenderChange, onPriceChange, onRadiusChange, onRegisterClick, onAdminClick
 }) => {
   return (
     <div className="w-full space-y-4 animate-fade-in px-2 md:px-0">
@@ -29,6 +33,9 @@ const SearchBar: React.FC<SearchBarProps> = ({
         {/* IBGE Location Filter Integration */}
         <div className="w-full lg:flex-1">
           <LocationFilter 
+            initialUf={selectedUf}
+            initialCity={selectedCity || ''}
+            onUfChange={onUfChange}
             onLocationChange={onCityChange}
             onSearch={() => {}} // Lógica de busca automática já aplicada no App.tsx
           />

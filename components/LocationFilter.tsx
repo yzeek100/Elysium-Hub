@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 
 interface UF {
@@ -12,15 +13,18 @@ interface City {
 }
 
 interface LocationFilterProps {
+  initialUf?: string;
+  initialCity?: string;
+  onUfChange: (uf: string) => void;
   onLocationChange: (city: string | null) => void;
   onSearch: () => void;
 }
 
-const LocationFilter: React.FC<LocationFilterProps> = ({ onLocationChange, onSearch }) => {
+const LocationFilter: React.FC<LocationFilterProps> = ({ initialUf = '', initialCity = '', onUfChange, onLocationChange, onSearch }) => {
   const [ufs, setUfs] = useState<UF[]>([]);
   const [cities, setCities] = useState<City[]>([]);
-  const [selectedUf, setSelectedUf] = useState<string>('');
-  const [selectedCity, setSelectedCity] = useState<string>('');
+  const [selectedUf, setSelectedUf] = useState<string>(initialUf);
+  const [selectedCity, setSelectedCity] = useState<string>(initialCity);
   const [loadingCities, setLoadingCities] = useState(false);
 
   // Carregar Estados ao montar
@@ -31,7 +35,7 @@ const LocationFilter: React.FC<LocationFilterProps> = ({ onLocationChange, onSea
       .catch(err => console.error("Erro ao buscar UFs:", err));
   }, []);
 
-  // Carregar Cidades quando UF mudar
+  // Carregar Cidades quando UF mudar ou na montagem inicial se tiver initialUf
   useEffect(() => {
     if (!selectedUf) {
       setCities([]);
@@ -52,8 +56,10 @@ const LocationFilter: React.FC<LocationFilterProps> = ({ onLocationChange, onSea
   }, [selectedUf]);
 
   const handleUfChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedUf(e.target.value);
+    const uf = e.target.value;
+    setSelectedUf(uf);
     setSelectedCity('');
+    onUfChange(uf);
     onLocationChange(null);
   };
 
